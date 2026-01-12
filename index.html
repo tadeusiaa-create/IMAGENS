@@ -3,149 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TV Experience</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Galeria Simples</title>
     <style>
-        /* Configuração do Fundo (Sala) */
+        /* --- ESTILOS GERAIS (CSS) --- */
+        :root {
+            --primary-color: #6366f1;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+        }
+
         body {
-            background-image: url('fundo01.png'); /* COLOQUE A FOTO DA SALA AQUI */
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
-            height: 100vh;
+            padding: 2rem;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            font-family: sans-serif;
         }
 
-        /* Container da TV (Mantém proporção 16:9) */
-        .tv-wrapper {
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-weight: 300;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: #64748b;
+        }
+
+        /* Área de Upload Customizada */
+        .upload-area {
             position: relative;
-            width: 90vw; /* Largura no celular */
-            max-width: 800px; /* Largura máxima no PC */
-            aspect-ratio: 16/9;
+            margin-bottom: 2rem;
         }
 
-        /* O Vídeo (Fica atrás da moldura) */
-        .screen-video {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            /* AJUSTE FINO: Se o vídeo vazar da TV, diminua essas porcentagens */
-            width: 94%; 
-            height: 90%;
-            object-fit: cover;
-            z-index: 1; /* Camada do meio */
-            background: #000;
+        input[type="file"] {
+            display: none;
         }
 
-        /* A Moldura da TV (PNG Transparente) */
-        .tv-frame {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 2; /* Camada de cima */
-            pointer-events: none; /* Permite clicar no vídeo através da moldura */
-            /* Certifique-se que sua imagem tv.png tem o centro transparente */
-        }
-
-        /* Botão Youtube Style */
-        .btn-shine {
-            position: relative;
-            overflow: hidden;
-            background: #FF0000;
+        .upload-btn {
+            background-color: var(--primary-color);
             color: white;
-            font-weight: bold;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            padding: 12px 24px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
-        
-        /* Animação do brilho */
-        .btn-shine::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.5);
+        }
+
+        /* Grid da Galeria */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .image-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+            aspect-ratio: 1 / 1; /* Mantém as imagens quadradas */
+        }
+
+        .image-card:hover {
+            transform: scale(1.03);
+            z-index: 10;
+        }
+
+        .image-card img {
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
-            transform: skewX(-20deg);
-            animation: shine 3s infinite;
+            object-fit: cover;
+            display: block;
         }
 
-        @keyframes shine {
-            0% { left: -100%; }
-            20% { left: 100%; }
-            100% { left: 100%; }
+        .tag {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
         }
 
-        /* Controle de Som Discreto */
-        .mute-control {
-            z-index: 10;
-            cursor: pointer;
+        /* Estado Vazio */
+        .empty-state {
+            text-align: center;
+            color: #94a3b8;
+            margin-top: 2rem;
+            display: none; /* Controlado via JS */
         }
     </style>
 </head>
 <body>
 
-    <div class="tv-wrapper">
-        
-        <video id="player" class="screen-video" autoplay loop muted playsinline>
-            <source src="TopStreaming.mp4" type="video/mp4">
-        </video>
+    <header>
+        <h1>Banco de Imagens</h1>
+        <p>Armazenamento simples para <strong>PNG</strong> e <strong>JPG</strong></p>
+    </header>
 
-        <img src="0112 (2)(1).png" class="tv-frame" alt="TV Frame">
-        
-        <button onclick="toggleMute()" class="mute-control absolute top-[6%] right-[6%] bg-black/60 p-2 rounded-full text-white hover:bg-red-600 transition">
-            <svg id="iconMute" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/></svg>
-            <svg id="iconSound" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
-        </button>
-
+    <div class="upload-area">
+        <label for="fileInput" class="upload-btn">
+            <span>+ Adicionar Imagem</span>
+        </label>
+        <input type="file" id="fileInput" accept="image/png, image/jpeg" multiple>
     </div>
 
-    <div class="mt-8 w-full max-w-[300px] px-4">
-        <button onclick="shareContent()" class="btn-shine w-full py-4 rounded-xl text-lg flex items-center justify-center gap-2 transform active:scale-95 transition">
-            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
-            COMPARTILHAR
-        </button>
+    <div class="empty-state" id="emptyState" style="display: block;">
+        Nenhuma imagem carregada ainda.
     </div>
+
+    <div class="gallery" id="gallery">
+        </div>
 
     <script>
-        const video = document.getElementById('player');
-        const iconMute = document.getElementById('iconMute');
-        const iconSound = document.getElementById('iconSound');
+        /* --- LÓGICA (JAVASCRIPT) --- */
+        const fileInput = document.getElementById('fileInput');
+        const gallery = document.getElementById('gallery');
+        const emptyState = document.getElementById('emptyState');
 
-        function toggleMute() {
-            video.muted = !video.muted;
-            if(video.muted){
-                iconMute.classList.remove('hidden');
-                iconSound.classList.add('hidden');
-            } else {
-                iconMute.classList.add('hidden');
-                iconSound.classList.remove('hidden');
-            }
-        }
+        fileInput.addEventListener('change', function(event) {
+            const files = event.target.files;
 
-        async function shareContent() {
-            try {
-                await navigator.share({
-                    title: 'Assista na TV',
-                    text: 'Olha que incrível:',
-                    url: window.location.href
+            if (files.length > 0) {
+                emptyState.style.display = 'none';
+                
+                Array.from(files).forEach(file => {
+                    // Validação de tipo simples
+                    if (!file.type.match('image/jpeg') && !file.type.match('image/png')) {
+                        alert(`O arquivo "${file.name}" não é suportado. Apenas PNG e JPG.`);
+                        return;
+                    }
+
+                    const reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        createImageCard(e.target.result, file.type);
+                    }
+
+                    reader.readAsDataURL(file);
                 });
-            } catch (err) {
-                navigator.clipboard.writeText(window.location.href);
-                alert('Link copiado!');
             }
+        });
+
+        function createImageCard(url, type) {
+            const card = document.createElement('div');
+            card.className = 'image-card';
+
+            // Define a etiqueta (tag) baseada no tipo
+            const formatText = type.includes('png') ? 'PNG' : 'JPG';
+
+            card.innerHTML = `
+                <img src="${url}" alt="Imagem carregada">
+                <span class="tag">${formatText}</span>
+            `;
+
+            gallery.appendChild(card);
         }
     </script>
 </body>
-
 </html>
